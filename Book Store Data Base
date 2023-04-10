@@ -1,0 +1,10 @@
+This is a project from Khan Academy I completed.
+
+CREATE TABLE books (id INTEGER PRIMARY KEY, name TEXT, rating INTEGER, price INTEGER, aisle INTEGER);
+INSERT INTO books VALUES (1, "LOTR", 5, $5, 10);
+INSERT INTO books VALUES (2, "NOTW", 4, $6, 10);
+INSERT INTO books VALUES (3, "WMF", 3, $7, 10);
+INSERT INTO books VALUES (4, "LOVE",4,$2, 2);
+INSERT INTO books VALUES (5, "BYE",1,$1,3);
+SELECT name FROM books ORDER BY rating;
+SELECT SUM(rating) FROM books ORDER BY rating;
