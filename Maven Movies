@@ -1,9 +1,9 @@
+-Using mavenmovies data base to answer questions about the data
+
 use mavenmovies;
 
-/*
-1.	We will need a list of all staff members, including their first and last names, 
-email addresses, and the store identification number where they work. 
-*/ 
+/* 1.We will need a list of all staff members, including their first and last names, 
+email addresses, and the store identification number where they work. */ 
 SELECT 
 	first_name,
     Last_name,
@@ -12,9 +12,7 @@ SELECT
     FROM staff;
 
 
-/*
-2.	We will need separate counts of inventory items held at each of your two stores. 
-*/ 
+/* 2.We will need separate counts of inventory items held at each of your two stores. */ 
 SELECT 
 	COUNT(inventory_id), 
 	store_id
@@ -22,9 +20,7 @@ SELECT
 	GROUP BY store_id;
 
 
-/*
-3.	We will need a count of active customers for each of your stores. Separately, please. 
-*/
+/* 3.We will need a count of active customers for each of your stores. Separately, please. */
 SELECT COUNT(customer_id), store_id
 FROM customer
 WHERE active = 1
@@ -32,19 +28,15 @@ GROUP BY store_id
 ORDER BY store_id;
     
 
-/*
-4.	In order to assess the liability of a data breach, we will need you to provide a count 
-of all customer email addresses stored in the database. 
-*/
+/*4.In order to assess the liability of a data breach, we will need you to provide a count 
+of all customer email addresses stored in the database. */
 SELECT COUNT(email) AS emails
 FROM customer;
 
 
-/*
-5.	We are interested in how diverse your film offering is as a means of understanding how likely 
+/*5.We are interested in how diverse your film offering is as a means of understanding how likely 
 you are to keep customers engaged in the future. Please provide a count of unique film titles 
-you have in inventory at each store and then provide a count of the unique categories of films you provide. 
-*/
+you have in inventory at each store and then provide a count of the unique categories of films you provide. */
 SELECT 
 store_id,
 COUNT(distinct film_id) as Unique_films
@@ -56,11 +48,9 @@ COUNT(distinct name) As Unique_Categories
 FROM category;
 
 
-/*
-6.	We would like to understand the replacement cost of your films. 
+/*6.We would like to understand the replacement cost of your films. 
 Please provide the replacement cost for the film that is least expensive to replace, 
-the most expensive to replace, and the average of all films you carry. ``	
-*/
+the most expensive to replace, and the average of all films you carry.*/
 SELECT 
 MIN(replacement_cost) as Least_Expensive_cost,
 MAX(replacement_cost) as Most_expesnive_cost, 
@@ -68,11 +58,9 @@ AVG(replacement_cost) as Average_replacment_cost
 FROM film;
     
 
-/*
-7.	We are interested in having you put payment monitoring systems and maximum payment 
+/*7.We are interested in having you put payment monitoring systems and maximum payment 
 processing restrictions in place in order to minimize the future risk of fraud by your staff. 
-Please provide the average payment you process, as well as the maximum payment you have processed.
-*/
+Please provide the average payment you process, as well as the maximum payment you have processed. */
 SELECT 
 AVG(amount) AS Average_Payment,
 MAX(amount) AS Max_Payment
@@ -80,14 +68,71 @@ FROM
 payment;
 
 
-/*
-8.	We would like to better understand what your customer base looks like. 
+/*8.We would like to better understand what your customer base looks like. 
 Please provide a list of all customer identification values, with a count of rentals 
-they have made all-time, with your highest volume customers at the top of the list.
-*/
+they have made all-time, with your highest volume customers at the top of the list.*/
 SELECT 
 customer_id, 
 COUNT(rental_id) As Number_of_Rentals
 FROM rental
 GROUP BY customer_id 
 ORDER BY COUNT(rental_id) desc
+
+/* 9. Can you pull for me a list of each film we have in inventory? 
+I would like to see the film's title, description and the store ID assoicated with each item and it's invenotry ID. */
+SELECT 
+inventory.store_id,
+inventory.inventory_id,
+film.title,
+film.description
+FROM inventory
+INNER JOIN film
+ON film.film_id = inventory.film_id;
+
+/* 10. One of our investors is interested in the films we carry and how many actors are listed for each film title. 
+Can you pull a list of all titles and figure out how many actors are assoicated with each title? */
+SELECT 
+	film.title,
+	COUNT(film_actor.actor_id) AS Count_Of_Actors
+    FROM film
+		LEFT JOIN film_actor
+        ON film_actor.film_id = film.film_id
+        GROUP BY film.title;
+        
+/* 11. Customers often ask which films their favorite actors appear in.
+It would be great to have a list of all actors, with each title that they appear in. Could you please pull that for me? */
+SELECT 
+	actor.first_name AS actor_first_name, 
+    actor.last_name AS actor_last_name,
+    film.title AS film_title
+    FROM actor
+    INNER JOIN film_actor
+    ON actor.actor_id = film_actor.actor_id
+    INNER JOIN film
+    ON film.film_id = film_actor.film_id
+    ORDER BY actor.last_name;
+
+/* 12. The manager from store 2 is working on expanding our film collection there. 
+Could you pull a list of distinct titles and their descirptions, currently available in inventory at store 2? */
+SELECT 
+distinct film.title,
+film.description
+FROM film
+INNER JOIN inventory
+ON film.film_id = inventory.film_id
+AND inventory.store_id = 2
+ORDER BY film.title;
+
+/* 13. We will be hosting a meeting with all of our staff and advisores soon.
+Could you pull one list of all staff and advisor names, include a column noting whether they are a staff member or advisor. */
+SELECT 
+'Advisor' AS 'Type',
+first_name,
+last_name
+FROM advisor
+UNION
+SELECT
+'Staff' AS 'Type',
+first_name,
+last_name
+FROM staff;
